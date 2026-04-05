@@ -3,7 +3,7 @@ import { InpaintPhase } from "@/hooks/useInpaint";
 export type EditorView = "upload" | "edit" | "processing" | "result";
 
 export function phaseToView(phase: InpaintPhase, previous: EditorView): EditorView {
-  if (phase === "uploading" || phase === "inferring") {
+  if (phase === "processing") {
     return "processing";
   }
   if (phase === "done") {

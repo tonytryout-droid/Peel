@@ -1,8 +1,11 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npx plugins:*)",
-      "Bash(claude plugins:*)"
+      "Bash(npx plugins:install)",
+      "Bash(npx plugins:list)",
+      "Bash(npx plugins:add)",
+      "Bash(claude plugins:install)",
+      "Bash(claude plugins:list)"
     ]
   }
 }

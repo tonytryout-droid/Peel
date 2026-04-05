@@ -6,11 +6,11 @@ import { useBrushCanvas } from "@/hooks/useBrushCanvas";
 interface MaskCanvasProps {
   imageFile: File;
   onSubmit: (imageDataUrl: string, maskDataUrl: string) => void;
+  processing?: boolean;
 }
 
-export function MaskCanvas({ imageFile, onSubmit }: MaskCanvasProps) {
+export function MaskCanvas({ imageFile, onSubmit, processing = false }: MaskCanvasProps) {
   const [brushSize, setBrushSize] = useState(28);
-  const brushPct = ((brushSize - 8) / (84 - 8)) * 100;
   const [isReady, setIsReady] = useState(false);
   const [dimensions, setDimensions] = useState<{ width: number; height: number } | null>(null);
   const {
@@ -43,6 +43,8 @@ export function MaskCanvas({ imageFile, onSubmit }: MaskCanvasProps) {
       cancelled = true;
     };
   }, [imageFile, loadImage]);
+
+  const canSubmit = isReady && !processing;
 
   return (
     <section style={{ display: "grid", gridTemplateColumns: "1fr 260px", gap: 16, alignItems: "start" }}>
@@ -126,10 +128,8 @@ export function MaskCanvas({ imageFile, onSubmit }: MaskCanvasProps) {
             max={84}
             value={brushSize}
             onChange={(event) => setBrushSize(Number(event.target.value))}
-            style={{
-              width: "100%",
-              background: `linear-gradient(to right, var(--primary) 0%, var(--primary) ${brushPct}%, var(--border) ${brushPct}%, var(--border) 100%)`
-            }}
+            style={{ width: "100%" }}
+            disabled={processing}
           />
         </div>
 
@@ -146,7 +146,7 @@ export function MaskCanvas({ imageFile, onSubmit }: MaskCanvasProps) {
               padding: "6px 10px"
             }}
           >
-            {dimensions.width} × {dimensions.height}px
+            {dimensions.width} x {dimensions.height}px
           </p>
         ) : null}
 
@@ -158,20 +158,21 @@ export function MaskCanvas({ imageFile, onSubmit }: MaskCanvasProps) {
           <button
             type="button"
             onClick={() => onSubmit(exportOriginalImage(), exportMask())}
-            disabled={!isReady}
+            disabled={!canSubmit}
             style={{
               background: "var(--primary)",
               color: "var(--primary-fg)",
               padding: "11px 16px",
-              fontSize: "0.9rem"
+              fontSize: "0.9rem",
+              opacity: canSubmit ? 1 : 0.7
             }}
           >
-            Remove Object
+            {processing ? "Removing object..." : "Remove Object"}
           </button>
           <button
             type="button"
             onClick={clearMask}
-            disabled={!isReady}
+            disabled={!isReady || processing}
             style={{
               background: "var(--surface-raised)",
               color: "var(--text)",

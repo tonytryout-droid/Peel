@@ -1,8 +1,11 @@
 import { App, cert, getApps, initializeApp } from "firebase-admin/app";
 import { Firestore, getFirestore } from "firebase-admin/firestore";
+import { getStorage } from "firebase-admin/storage";
+import { Bucket } from "@google-cloud/storage";
 
 let cachedApp: App | null = null;
 let cachedDb: Firestore | null = null;
+let cachedBucket: Bucket | null = null;
 
 function getAdminApp(): App {
   if (cachedApp) {
@@ -38,4 +41,19 @@ export function getAdminDb(): Firestore {
   }
   cachedDb = getFirestore(getAdminApp());
   return cachedDb;
+}
+
+export function getAdminStorageBucket(): Bucket {
+  if (cachedBucket) {
+    return cachedBucket;
+  }
+
+  const bucketName =
+    process.env.FIREBASE_ADMIN_STORAGE_BUCKET ?? process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET;
+  if (!bucketName) {
+    throw new Error("Missing Firebase storage bucket environment variable.");
+  }
+
+  cachedBucket = getStorage(getAdminApp()).bucket(bucketName);
+  return cachedBucket;
 }

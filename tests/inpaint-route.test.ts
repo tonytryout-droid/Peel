@@ -1,93 +1,107 @@
 // @vitest-environment node
 
-import { describe, expect, it, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it, vi, afterEach } from "vitest";
 import { NextRequest } from "next/server";
 
-const { createOrReuseJob, logJobEvent, setJobStatus, replicateCreate } = vi.hoisted(() => ({
-  createOrReuseJob: vi.fn(),
-  logJobEvent: vi.fn(),
-  setJobStatus: vi.fn(),
-  replicateCreate: vi.fn()
+const { uploadResultPng } = vi.hoisted(() => ({
+  uploadResultPng: vi.fn()
 }));
 
-vi.mock("@/lib/jobs", () => ({
-  createOrReuseJob,
-  logJobEvent,
-  setJobStatus
-}));
-
-vi.mock("@/lib/replicate", () => ({
-  getLamaModelVersion: () => "abc123",
-  getReplicateClient: () => ({
-    predictions: {
-      create: replicateCreate
-    }
-  })
+vi.mock("@/lib/upload-server", () => ({
+  uploadResultPng
 }));
 
 import { POST } from "@/app/api/inpaint/route";
 
+const IMAGE_DATA_URL = "data:image/png;base64,AA==";
+
 describe("POST /api/inpaint", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    process.env.LAMA_URL = "http://lama:8080";
   });
 
-  it("returns reused job without calling Replicate", async () => {
-    createOrReuseJob.mockResolvedValue({
-      jobId: "job_1",
-      status: "processing",
-      reused: true,
-      requestHash: "hash_1"
-    });
-
-    const req = new NextRequest("http://localhost/api/inpaint", {
-      method: "POST",
-      body: JSON.stringify({
-        imageUrl: "https://img",
-        maskUrl: "https://mask"
-      })
-    });
-
-    const res = await POST(req);
-    const json = await res.json();
-
-    expect(res.status).toBe(200);
-    expect(json).toEqual({ jobId: "job_1", status: "processing", reused: true });
-    expect(replicateCreate).not.toHaveBeenCalled();
+  afterEach(() => {
+    vi.unstubAllGlobals();
   });
 
-  it("starts new prediction and returns processing state", async () => {
-    createOrReuseJob.mockResolvedValue({
-      jobId: "job_2",
-      status: "pending",
-      reused: false,
-      requestHash: "hash_2"
-    });
-    replicateCreate.mockResolvedValue({ id: "rep_1" });
-
-    const req = new NextRequest("http://localhost/api/inpaint", {
-      method: "POST",
-      body: JSON.stringify({
-        imageUrl: "https://img",
-        maskUrl: "https://mask",
-        imageSha256: "a",
-        maskSha256: "b"
-      })
-    });
-
-    const res = await POST(req);
-    const json = await res.json();
-
-    expect(res.status).toBe(200);
-    expect(json).toEqual({ jobId: "job_2", status: "processing", reused: false });
-    expect(replicateCreate).toHaveBeenCalledTimes(1);
-    expect(setJobStatus).toHaveBeenCalledWith(
-      expect.objectContaining({
-        jobId: "job_2",
-        status: "processing",
-        replicateId: "rep_1",
-        requestHash: expect.any(String)
+  it("returns resultUrl for a successful Lama response", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(
+      new Response(Uint8Array.from([1, 2, 3]), {
+        status: 200,
+        headers: { "content-type": "image/png" }
       })
     );
+    vi.stubGlobal("fetch", fetchMock);
+    uploadResultPng.mockResolvedValue("https://storage/result.png");
+
+    const req = new NextRequest("http://localhost/api/inpaint", {
+      method: "POST",
+      body: JSON.stringify({
+        imageDataUrl: IMAGE_DATA_URL,
+        maskDataUrl: IMAGE_DATA_URL
+      })
+    });
+
+    const res = await POST(req);
+    const json = await res.json();
+
+    expect(res.status).toBe(200);
+    expect(json).toEqual({ resultUrl: "https://storage/result.png" });
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(uploadResultPng).toHaveBeenCalledTimes(1);
+  });
+
+  it("retries once when Lama returns a 500", async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(new Response("error", { status: 500 }))
+      .mockResolvedValueOnce(new Response(Uint8Array.from([9, 9, 9]), { status: 200 }));
+    vi.stubGlobal("fetch", fetchMock);
+    uploadResultPng.mockResolvedValue("https://storage/retry.png");
+
+    const req = new NextRequest("http://localhost/api/inpaint", {
+      method: "POST",
+      body: JSON.stringify({
+        imageDataUrl: IMAGE_DATA_URL,
+        maskDataUrl: IMAGE_DATA_URL
+      })
+    });
+
+    const res = await POST(req);
+    const json = await res.json();
+
+    expect(res.status).toBe(200);
+    expect(json).toEqual({ resultUrl: "https://storage/retry.png" });
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+  });
+
+  it("returns 400 for invalid request payload", async () => {
+    const req = new NextRequest("http://localhost/api/inpaint", {
+      method: "POST",
+      body: JSON.stringify({})
+    });
+
+    const res = await POST(req);
+    expect(res.status).toBe(400);
+  });
+
+  it("returns 504 when Lama request times out", async () => {
+    const fetchMock = vi.fn().mockRejectedValue(new DOMException("Timed out", "AbortError"));
+    vi.stubGlobal("fetch", fetchMock);
+
+    const req = new NextRequest("http://localhost/api/inpaint", {
+      method: "POST",
+      body: JSON.stringify({
+        imageDataUrl: IMAGE_DATA_URL,
+        maskDataUrl: IMAGE_DATA_URL
+      })
+    });
+
+    const res = await POST(req);
+    const json = await res.json();
+
+    expect(res.status).toBe(504);
+    expect(json).toEqual({ error: "Lama inference timed out." });
   });
 });
