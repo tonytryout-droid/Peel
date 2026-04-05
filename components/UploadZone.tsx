@@ -38,7 +38,9 @@ async function readImageDimensions(file: File): Promise<{ width: number; height:
 export function UploadZone({ onFile }: UploadZoneProps) {
   const [error, setError] = useState<string | null>(null);
   const [checking, setChecking] = useState(false);
+  const [dragging, setDragging] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const dragCounterRef = useRef(0);
 
   const validateAndSend = useCallback(
     async (file: File) => {
@@ -73,31 +75,76 @@ export function UploadZone({ onFile }: UploadZoneProps) {
   return (
     <section
       style={{
-        border: "2px dashed #d1d5db",
-        borderRadius: 16,
-        padding: 40,
+        border: `2px dashed ${dragging ? "var(--primary)" : "var(--border-strong)"}`,
+        borderRadius: "var(--radius-xl)",
+        padding: "56px 40px",
         textAlign: "center",
-        background: "#ffffff"
+        background: dragging ? "var(--surface-raised)" : "var(--surface)",
+        boxShadow: "var(--shadow-sm)",
+        transition: "border-color 0.15s, background 0.15s",
+        cursor: "pointer"
       }}
-      onDragOver={(event) => event.preventDefault()}
+      onClick={() => inputRef.current?.click()}
+      onDragEnter={(event) => {
+        event.preventDefault();
+        dragCounterRef.current++;
+        if (dragCounterRef.current > 0) {
+          setDragging(true);
+        }
+      }}
+      onDragOver={(event) => { event.preventDefault(); }}
+      onDragLeave={() => {
+        dragCounterRef.current--;
+        if (dragCounterRef.current === 0) {
+          setDragging(false);
+        }
+      }}
       onDrop={(event) => {
         event.preventDefault();
+        dragCounterRef.current = 0;
+        setDragging(false);
         const file = event.dataTransfer.files?.[0];
         if (file) {
           void validateAndSend(file);
         }
       }}
     >
-      <h2 style={{ marginTop: 0 }}>Upload your image</h2>
-      <p>JPG, PNG, WEBP. Max 10MB and 4 megapixels.</p>
+      {/* Upload icon */}
+      <div
+        style={{
+          display: "inline-flex",
+          alignItems: "center",
+          justifyContent: "center",
+          width: 56,
+          height: 56,
+          borderRadius: "var(--radius-md)",
+          background: "var(--surface-raised)",
+          border: "1px solid var(--border)",
+          marginBottom: 16
+        }}
+      >
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden>
+          <path d="M12 16V8M12 8l-3 3M12 8l3 3" stroke="var(--text-muted)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+          <path d="M4 16.8A4 4 0 0 1 4 9a5 5 0 0 1 9.9-1A4 4 0 1 1 17 16.8" stroke="var(--text-muted)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+      </div>
+
+      <h2 style={{ margin: "0 0 8px", fontSize: "1.2rem", fontWeight: 700 }}>
+        {dragging ? "Drop to upload" : "Upload your image"}
+      </h2>
+      <p style={{ margin: "0 0 24px", color: "var(--text-muted)", fontSize: "0.9rem" }}>
+        Drag and drop or click to browse &mdash; JPG, PNG, WEBP, max 10MB
+      </p>
+
       <button
         type="button"
-        onClick={() => inputRef.current?.click()}
+        onClick={(e) => { e.stopPropagation(); inputRef.current?.click(); }}
         disabled={checking}
-        style={{ background: "#0f172a", color: "#fff" }}
+        style={{ background: "var(--primary)", color: "var(--primary-fg)", padding: "11px 24px" }}
       >
-        {checking ? "Checking..." : "Choose File"}
+        {checking ? "Checking…" : "Choose File"}
       </button>
+
       <input
         ref={inputRef}
         type="file"
@@ -110,7 +157,19 @@ export function UploadZone({ onFile }: UploadZoneProps) {
           }
         }}
       />
-      {error ? <p style={{ color: "#b91c1c", marginBottom: 0 }}>{error}</p> : null}
+
+      {error ? (
+        <p
+          style={{
+            margin: "20px 0 0",
+            color: "var(--danger)",
+            fontSize: "0.875rem",
+            fontWeight: 500
+          }}
+        >
+          {error}
+        </p>
+      ) : null}
     </section>
   );
 }
