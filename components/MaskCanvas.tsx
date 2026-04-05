@@ -26,10 +26,21 @@ export function MaskCanvas({ imageFile, onSubmit }: MaskCanvasProps) {
 
   useEffect(() => {
     setIsReady(false);
-    void loadImage(imageFile).then((next) => {
-      setDimensions(next);
-      setIsReady(true);
-    });
+    let cancelled = false;
+    loadImage(imageFile)
+      .then((next) => {
+        if (!cancelled) {
+          setDimensions(next);
+          setIsReady(true);
+        }
+      })
+      .catch(() => {
+        // loadImage throws with a descriptive message;
+        // isReady stays false, preventing submission
+      });
+    return () => {
+      cancelled = true;
+    };
   }, [imageFile, loadImage]);
 
   return (

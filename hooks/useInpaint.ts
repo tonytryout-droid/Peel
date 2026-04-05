@@ -28,25 +28,12 @@ export function useInpaint() {
     if (poll.status === "done") {
       const latency = startedAt ? Date.now() - startedAt : null;
       setElapsedMs(latency);
-      console.log({
-        phase: "client_completed",
-        jobId,
-        status: "done",
-        latencyMs: latency
-      });
       setPhase("done");
       return;
     }
     if (poll.status === "failed") {
       const latency = startedAt ? Date.now() - startedAt : null;
       setElapsedMs(latency);
-      console.log({
-        phase: "client_failed",
-        jobId,
-        status: "failed",
-        latencyMs: latency,
-        errorCode: poll.error ?? "inference_failed"
-      });
       setError(poll.error ?? "Model failed.");
       setPhase("error");
     }
@@ -92,12 +79,6 @@ export function useInpaint() {
 
       const payload = (await response.json()) as InpaintResponse;
       setJobId(payload.jobId);
-      console.log({
-        phase: "client_job_started",
-        jobId: payload.jobId,
-        status: payload.status,
-        reused: payload.reused
-      });
       setPhase("inferring");
     } catch (caught) {
       const message = caught instanceof Error ? caught.message : "Unexpected error.";

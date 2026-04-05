@@ -157,8 +157,6 @@ export async function logJobEvent(input: {
     createdAt: Date.now()
   };
 
-  console.log(payload);
-
   const db = getAdminDb();
   await db
     .collection(JOBS_COLLECTION)

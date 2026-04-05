@@ -30,7 +30,19 @@ export function ResultViewer({ originalUrl, resultUrl, elapsedMs }: ResultViewer
         </figure>
       </div>
       <div style={{ display: "flex", gap: 12 }}>
-        <a href={resultUrl} download="peel-result.png">
+        <a
+          href={resultUrl}
+          download="peel-result.png"
+          style={{
+            display: "inline-block",
+            background: "#0f172a",
+            color: "#fff",
+            borderRadius: 10,
+            padding: "10px 14px",
+            fontWeight: 600,
+            textDecoration: "none"
+          }}
+        >
           Download
         </a>
       </div>

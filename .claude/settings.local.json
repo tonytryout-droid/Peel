@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep -r \"console\\\\.\" /c/Users/Kekab/peel/Peel --include=\"*.ts\" --include=\"*.tsx\" ! -path \"*/node_modules/*\" ! -path \"*/.firebase/*\" ! -path \"*/.next/*\")"
+    ]
+  }
+}
