@@ -47,7 +47,7 @@ export function MaskCanvas({ imageFile, onSubmit, processing = false }: MaskCanv
   const canSubmit = isReady && !processing;
 
   return (
-    <section style={{ display: "grid", gridTemplateColumns: "1fr 260px", gap: 16, alignItems: "start" }}>
+    <section className="editor-canvas-layout">
       {/* Canvas panel */}
       <div
         style={{

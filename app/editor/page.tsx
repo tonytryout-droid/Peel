@@ -85,9 +85,23 @@ export default function EditorPage() {
               setImageFile(null);
               setView("upload");
             }}
-            style={{ width: "fit-content", background: "var(--primary)", color: "var(--primary-fg)" }}
+            style={{
+              width: "fit-content",
+              background: "var(--surface)",
+              color: "var(--text)",
+              border: "1px solid var(--border)",
+              boxShadow: "var(--shadow-sm)",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 6,
+              padding: "9px 16px",
+              fontSize: "0.875rem"
+            }}
           >
-            {"<- New Image"}
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden>
+              <path d="M9 11L5 7l4-4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+            New Image
           </button>
         </div>
       ) : null}

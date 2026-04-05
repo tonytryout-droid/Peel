@@ -100,13 +100,7 @@ export function ResultViewer({ originalUrl, resultUrl, elapsedMs }: ResultViewer
       </div>
 
       {/* Image comparison */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: originalUrl ? "1fr 1fr" : "1fr",
-          gap: 12
-        }}
-      >
+      <div className={`result-image-grid${originalUrl ? " two-up" : ""}`}>
         {originalUrl ? (
           <figure style={{ margin: 0, display: "grid", gap: 8 }}>
             <img

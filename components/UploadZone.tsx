@@ -74,10 +74,10 @@ export function UploadZone({ onFile }: UploadZoneProps) {
 
   return (
     <section
+      className="upload-zone-inner"
       style={{
         border: `2px dashed ${dragging ? "var(--primary)" : "var(--border-strong)"}`,
         borderRadius: "var(--radius-xl)",
-        padding: "56px 40px",
         textAlign: "center",
         background: dragging ? "var(--surface-raised)" : "var(--surface)",
         boxShadow: "var(--shadow-sm)",

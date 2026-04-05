@@ -83,9 +83,6 @@ export default function HomePage() {
         {/* How it works */}
         <div
           style={{
-            display: "flex",
-            gap: 0,
-            alignItems: "flex-start",
             marginTop: 8,
             background: "var(--surface)",
             border: "1px solid var(--border)",
@@ -94,46 +91,39 @@ export default function HomePage() {
             boxShadow: "var(--shadow-sm)"
           }}
         >
-          {[
-            { n: "1", label: "Upload", desc: "Drop your photo" },
-            { n: "2", label: "Mask", desc: "Paint the object" },
-            { n: "3", label: "Download", desc: "Get the clean result" },
-          ].map(({ n, label, desc }, i) => (
-            <div key={n} style={{ display: "flex", alignItems: "center", gap: 0 }}>
-              {i > 0 && (
-                <div style={{
-                  width: 24,
-                  height: 1,
-                  background: "var(--border)",
-                  margin: "0 12px",
-                  marginBottom: 14,
-                  flexShrink: 0
-                }} />
-              )}
-              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                <div style={{
-                  width: 26,
-                  height: 26,
-                  borderRadius: "50%",
-                  background: "var(--surface-raised)",
-                  border: "1px solid var(--border)",
-                  color: "var(--text-muted)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontSize: "0.72rem",
-                  fontWeight: 700,
-                  flexShrink: 0
-                }}>
-                  {n}
-                </div>
-                <div style={{ textAlign: "left" }}>
-                  <div style={{ fontSize: "0.825rem", fontWeight: 700, lineHeight: 1.2 }}>{label}</div>
-                  <div style={{ fontSize: "0.75rem", color: "var(--text-muted)", lineHeight: 1.3 }}>{desc}</div>
+          <div className="steps-row">
+            {[
+              { n: "1", label: "Upload", desc: "Drop your photo" },
+              { n: "2", label: "Mask", desc: "Paint the object" },
+              { n: "3", label: "Download", desc: "Get the clean result" },
+            ].map(({ n, label, desc }, i) => (
+              <div key={n} style={{ display: "flex", alignItems: "center", gap: 0 }}>
+                {i > 0 && <div className="steps-connector" />}
+                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                  <div style={{
+                    width: 26,
+                    height: 26,
+                    borderRadius: "50%",
+                    background: "var(--surface-raised)",
+                    border: "1px solid var(--border)",
+                    color: "var(--text-muted)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: "0.72rem",
+                    fontWeight: 700,
+                    flexShrink: 0
+                  }}>
+                    {n}
+                  </div>
+                  <div style={{ textAlign: "left" }}>
+                    <div style={{ fontSize: "0.825rem", fontWeight: 700, lineHeight: 1.2 }}>{label}</div>
+                    <div style={{ fontSize: "0.75rem", color: "var(--text-muted)", lineHeight: 1.3 }}>{desc}</div>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
 
         {/* Supported formats */}
