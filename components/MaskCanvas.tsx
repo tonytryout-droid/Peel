@@ -10,6 +10,7 @@ interface MaskCanvasProps {
 
 export function MaskCanvas({ imageFile, onSubmit }: MaskCanvasProps) {
   const [brushSize, setBrushSize] = useState(28);
+  const brushPct = ((brushSize - 8) / (84 - 8)) * 100;
   const [isReady, setIsReady] = useState(false);
   const [dimensions, setDimensions] = useState<{ width: number; height: number } | null>(null);
   const {
@@ -125,7 +126,10 @@ export function MaskCanvas({ imageFile, onSubmit }: MaskCanvasProps) {
             max={84}
             value={brushSize}
             onChange={(event) => setBrushSize(Number(event.target.value))}
-            style={{ width: "100%" }}
+            style={{
+              width: "100%",
+              background: `linear-gradient(to right, var(--primary) 0%, var(--primary) ${brushPct}%, var(--border) ${brushPct}%, var(--border) 100%)`
+            }}
           />
         </div>
 

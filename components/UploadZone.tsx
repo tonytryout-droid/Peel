@@ -159,16 +159,27 @@ export function UploadZone({ onFile }: UploadZoneProps) {
       />
 
       {error ? (
-        <p
+        <div
           style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
             margin: "20px 0 0",
+            background: "var(--danger-bg)",
+            border: "1px solid var(--danger-border)",
+            borderRadius: "var(--radius-sm)",
+            padding: "10px 14px",
             color: "var(--danger)",
             fontSize: "0.875rem",
             fontWeight: 500
           }}
         >
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden style={{ flexShrink: 0 }}>
+            <circle cx="8" cy="8" r="7" stroke="currentColor" strokeWidth="1.5"/>
+            <path d="M8 5v3.5M8 11h.01" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/>
+          </svg>
           {error}
-        </p>
+        </div>
       ) : null}
     </section>
   );

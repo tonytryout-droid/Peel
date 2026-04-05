@@ -38,7 +38,25 @@ export function ResultViewer({ originalUrl, resultUrl, elapsedMs }: ResultViewer
       {/* Header row */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <h2 style={{ margin: 0, fontSize: "1.15rem", fontWeight: 700 }}>Result</h2>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <div
+              style={{
+                width: 22,
+                height: 22,
+                borderRadius: "50%",
+                background: "var(--success)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0
+              }}
+            >
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden>
+                <path d="M2 6l3 3 5-5" stroke="white" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </div>
+            <h2 style={{ margin: 0, fontSize: "1.15rem", fontWeight: 700 }}>Done</h2>
+          </div>
           {elapsedMs !== null ? (
             <span
               style={{
@@ -115,7 +133,7 @@ export function ResultViewer({ originalUrl, resultUrl, elapsedMs }: ResultViewer
         ) : null}
 
         <figure style={{ margin: 0, display: "grid", gap: 8 }}>
-          <div style={{ position: "relative" }}>
+          <div>
             <img
               src={resultUrl}
               alt="Inpaint result"
@@ -126,23 +144,6 @@ export function ResultViewer({ originalUrl, resultUrl, elapsedMs }: ResultViewer
                 display: "block"
               }}
             />
-            <span
-              style={{
-                position: "absolute",
-                top: 10,
-                right: 10,
-                background: "var(--primary)",
-                color: "var(--primary-fg)",
-                borderRadius: 99,
-                padding: "3px 10px",
-                fontSize: "0.72rem",
-                fontWeight: 700,
-                letterSpacing: "0.05em",
-                textTransform: "uppercase"
-              }}
-            >
-              Result
-            </span>
           </div>
           <figcaption
             style={{

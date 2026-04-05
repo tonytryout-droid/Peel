@@ -17,8 +17,8 @@ export default function HomePage() {
         <span
           style={{
             display: "inline-block",
-            background: "#0f172a",
-            color: "#fff",
+            background: "var(--primary)",
+            color: "var(--primary-fg)",
             borderRadius: 99,
             padding: "5px 14px",
             fontSize: "0.75rem",
@@ -80,9 +80,82 @@ export default function HomePage() {
           </Link>
         </div>
 
-        <p style={{ margin: 0, color: "var(--text-subtle)", fontSize: "0.825rem" }}>
-          Supports JPG, PNG, WEBP &mdash; up to 10MB
-        </p>
+        {/* How it works */}
+        <div
+          style={{
+            display: "flex",
+            gap: 0,
+            alignItems: "flex-start",
+            marginTop: 8,
+            background: "var(--surface)",
+            border: "1px solid var(--border)",
+            borderRadius: "var(--radius-lg)",
+            padding: "14px 20px",
+            boxShadow: "var(--shadow-sm)"
+          }}
+        >
+          {[
+            { n: "1", label: "Upload", desc: "Drop your photo" },
+            { n: "2", label: "Mask", desc: "Paint the object" },
+            { n: "3", label: "Download", desc: "Get the clean result" },
+          ].map(({ n, label, desc }, i) => (
+            <div key={n} style={{ display: "flex", alignItems: "center", gap: 0 }}>
+              {i > 0 && (
+                <div style={{
+                  width: 24,
+                  height: 1,
+                  background: "var(--border)",
+                  margin: "0 12px",
+                  marginBottom: 14,
+                  flexShrink: 0
+                }} />
+              )}
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <div style={{
+                  width: 26,
+                  height: 26,
+                  borderRadius: "50%",
+                  background: "var(--surface-raised)",
+                  border: "1px solid var(--border)",
+                  color: "var(--text-muted)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: "0.72rem",
+                  fontWeight: 700,
+                  flexShrink: 0
+                }}>
+                  {n}
+                </div>
+                <div style={{ textAlign: "left" }}>
+                  <div style={{ fontSize: "0.825rem", fontWeight: 700, lineHeight: 1.2 }}>{label}</div>
+                  <div style={{ fontSize: "0.75rem", color: "var(--text-muted)", lineHeight: 1.3 }}>{desc}</div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Supported formats */}
+        <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap", justifyContent: "center" }}>
+          {["JPG", "PNG", "WEBP"].map((fmt) => (
+            <span
+              key={fmt}
+              style={{
+                background: "var(--surface-raised)",
+                border: "1px solid var(--border)",
+                borderRadius: 99,
+                padding: "2px 10px",
+                fontSize: "0.75rem",
+                fontWeight: 600,
+                color: "var(--text-muted)"
+              }}
+            >
+              {fmt}
+            </span>
+          ))}
+          <span style={{ color: "var(--text-subtle)", fontSize: "0.75rem" }}>&mdash; up to 10MB</span>
+        </div>
       </div>
     </main>
   );
